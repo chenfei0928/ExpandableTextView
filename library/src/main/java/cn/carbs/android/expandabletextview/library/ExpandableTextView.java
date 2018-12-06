@@ -391,51 +391,17 @@ public class ExpandableTextView extends TextView{
         }
     }
 
+    private View.OnClickListener mOnClickLis;
+
     public View.OnClickListener getOnClickListener(View view) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            return getOnClickListenerV14(view);
-        } else {
-            return getOnClickListenerV(view);
-        }
+        return mOnClickLis;
     }
 
-    private View.OnClickListener getOnClickListenerV(View view) {
-        View.OnClickListener retrievedListener = null;
-        try {
-            Field field = Class.forName(CLASS_NAME_VIEW).getDeclaredField("mOnClickListener");
-            field.setAccessible(true);
-            retrievedListener = (View.OnClickListener) field.get(view);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return retrievedListener;
+    @Override
+    public void setOnClickListener(View.OnClickListener l) {
+        super.setOnClickListener(l);
+        mOnClickLis = l;
     }
-
-    private View.OnClickListener getOnClickListenerV14(View view) {
-        View.OnClickListener retrievedListener = null;
-        try {
-            Field listenerField = Class.forName(CLASS_NAME_VIEW).getDeclaredField("mListenerInfo");
-            Object listenerInfo = null;
-
-            if (listenerField != null) {
-                listenerField.setAccessible(true);
-                listenerInfo = listenerField.get(view);
-            }
-
-            Field clickListenerField = Class.forName(CLASS_NAME_LISTENER_INFO).getDeclaredField("mOnClickListener");
-
-            if (clickListenerField != null && listenerInfo != null) {
-                clickListenerField.setAccessible(true);
-                retrievedListener = (View.OnClickListener) clickListenerField.get(listenerInfo);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return retrievedListener;
-    }
-
 
     /**
      * Copy from:
